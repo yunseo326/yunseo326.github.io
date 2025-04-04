@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>화면 클릭 시 동그라미 슬라이드</title>
+  <style>
+    /* 기본 여백 제거 및 박스 모델 설정 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;  /* 스크롤 숨기기 */
+      font-family: sans-serif;
+      position: relative;  /* ✅ 요거 꼭 필요해 */
+    }
+    
+    
+    
+    
+    
+/* 배경 삼각형 레이어 */
+.bg-shape {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 위 오른쪽 삼각형 → ✅ 크기 키움 */
+.triangle1 {
+  background: linear-gradient(to left bottom, rgba(200, 220, 255, 1), transparent);
+  clip-path: polygon(100% 0, 100% 70%, 30% 0); /* 더 넓게 퍼지도록 변경 */
+}
+
+/* 아래 오른쪽 삼각형 → 그대로 */
+.triangle2 {
+  background: linear-gradient(to left top, rgba(200, 220, 255, 1), transparent);
+  clip-path: polygon(100% 100%, 100% 50%, 50% 100%);
+}
+
+
+/* 왼쪽 아래 삼각형 → ❌ 삭제됨 (제거됨) */
+/* .triangle4 는 삭제했습니다 */
+
+
+    .main-text {
+      font-size: 40px;
+      font-weight: bold;
+    }
+
+    .sub-text {
+      font-size: 16px;
+      margin-top: 8px;
+      opacity: 0.9;
+    }
+
+    /* 동그란 요소 클래스 생성 (슬라이드 안에 들어감) */
+    .circle {
+      width: 550px;
+      height: 550px;
+      left: -200px;     /* 왼쪽에서 50px 떨어짐 */  
+      bottom: -100px;     /* 왼쪽에서 50px 떨어짐 */  
+	  z-index: 10;        
+      /* 숫자가 클수록 위에 있음 사진보다 위에 있도록 설정 */
+
+	  border-radius: 100%;              /* 원 형태 만들기 */
+      display: flex;
+      background: linear-gradient(90deg,  #6a11cb, #a3cfff);      
+      
+      flex-direction: column; /* 세로 정렬  줄바꿈 도와주는 거임*/
+      align-items: left;      /* 왼쪽 정렬 */
+      
+      font-size: 50px;               /* 글씨 크기 조절 */
+  	  font-family: 'Segoe UI', sans-serif; /* 글꼴 설정 */
+  	  font-weight: bold;             /* 글씨 굵게 */
+      color: white;
+	  position: absolute;     /* 추가: 위치 조정 가능하도록 설정 */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding-left: 220px; /* 텍스트를 오른쪽으로 밀어냄 */
+
+      
+      justify-content: center;
+      
+      transition: transform 2s ease, opacity 1s ease;
+    }
+    
+    /* 왼쪽으로 사라지는 효과 */
+    .circle.slide-out {
+      transform: translateX(-120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    
+    
+    /* 메인에서 사용할 놈들*/
+    .photo-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0; /* 기본적으로 사진 사이 간격을 없앰 */
+      position: relative;
+      margin-top: 40px;/* ⬅ 더 위로 올라가게 조정 (기존 100px → 50px)*/
+      pointer-events: none; /* 처음엔 클릭 안되도록 */
+	  z-index: 1;         /* 뒤에 있도록 설정 */
+    }
+
+    .photo {
+      width: 230px;  /* 사진 크기*/
+      height: 230px; /* 사진 크기*/
+      
+      object-fit: cover;
+      border-radius: 0px; // 모서리가 둥근정도 클수록 원에 가까워짐
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      position: relative;
+      transition: transform 0.3s ease, z-index 0.3s ease;
+      
+      margin-left: -90px; /* 겹치는 정도 조절 */
+    }
+
+    /* 맨 첫 번째 사진은 왼쪽 마진 없음 */
+    .photo:first-child {
+      margin-left: 0;
+    }
+
+    /* 마우스 호버 시 앞으로 튀어나오게 */
+    .photo:hover {
+      transform: scale(1.05);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-shape triangle1"></div>
+  <div class="bg-shape triangle2"></div>
+
+
+  
+  <div class="main-content">
+    <div class="circle" id="circle">
+      <div class="main-text">WELCOME</div>
+      <div class="sub-text">Have a great day!</div>
+    </div>
+    
+    <div class="content">
+
+  
+      <!-- 여기에 메인 화면 내용이 계속 보여짐 -->
+      <h1>Main Content</h1>
+        <div class="photo-wrapper">
+			<img class="photo" src="https://picsum.photos/id/1015/300/400" alt="Photo">
+			<img class="photo" src="https://picsum.photos/id/1016/300/400" alt="Photo">
+			<img class="photo" src="https://picsum.photos/id/1018/300/400" alt="Photo">
+        </div>
+    
+    </div>
+  </div>
+  
+  <script>
+  const circle = document.getElementById('circle');
+  const photos = document.querySelector('.photo-wrapper'); 
+
+  circle.addEventListener('click', () => {
+    circle.classList.add('slide-out');
+
+    setTimeout(() => {
+      photos.style.pointerEvents = 'auto';
+    }, 1000); // 애니메이션 시간과 맞추기
+  });
+  </script>
+
+</body>
+</html>
